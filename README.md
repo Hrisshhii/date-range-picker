@@ -13,7 +13,7 @@ axe-core accessibility validation
 
 ### Objective
 
-- Build a deterministic date and time range picker that:
+Build a deterministic date and time range picker that:
 - Handles timezone switching without shifting selected instants
 - Correctly manages DST transitions
 - Enforces explicit constraints (min/max, blackout dates, duration)
@@ -26,7 +26,7 @@ axe-core accessibility validation
 
 This project separates concerns into two major layers:
 
-# Core Logic Layer
+1) Core Logic Layer
 
 - Zoned date-time modeling
 - Instant-safe state representation
@@ -37,7 +37,7 @@ This project separates concerns into two major layers:
 
 ---
 
-# UI Layer
+2) UI Layer
 
 - Custom-built calendar grid
 - Keyboard navigation system
