@@ -1,73 +1,101 @@
-# React + TypeScript + Vite
+### Timezone-Safe Date & Time Range Picker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A fully accessible, DST-safe, timezone-aware Date & Time Range Picker built with:
+React 18
+TypeScript (strict mode)
+Tailwind CSS
+Storybook
+Chromatic
+Testing Library
+axe-core accessibility validation
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Objective
 
-## React Compiler
+- Build a deterministic date and time range picker that:
+- Handles timezone switching without shifting selected instants
+- Correctly manages DST transitions
+- Enforces explicit constraints (min/max, blackout dates, duration)
+- Supports full keyboard-only workflows
+- Provides screen-reader parity via ARIA grid semantics
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+### Architecture Overview
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+This project separates concerns into two major layers:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# Core Logic Layer
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Zoned date-time modeling
+- Instant-safe state representation
+- Constraint validation engine
+- Preset resolution logic
+- Deterministic rounding rules
+- DST-aware conversions using native Intl
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+# UI Layer
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Custom-built calendar grid
+- Keyboard navigation system
+- Focus management
+- ARIA-compliant grid semantics
+- Edge-case-driven Storybook stories
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+### Strict Engineering Constraints
+
+No external date-picker libraries
+No component libraries
+No imported picker logic
+TypeScript strict mode enabled
+No silent coercion of invalid inputs
+Accessibility treated as first-class concern
+
+---
+
+### Testing Strategy
+
+- Interaction tests using React Testing Library
+- Accessibility assertions using axe-core
+- Constraint validation coverage
+- DST edge-case tests
+- No snapshot-only testing
+
+---
+
+### Accessibility Commitment
+
+- Keyboard-first navigation
+- Proper ARIA grid roles
+- Focus-visible management
+- Screen reader announcements
+- High-contrast mode support
+
+---
+
+#### Timezone & DST Handling
+
+- Selections are stored as absolute UTC instants with explicit IANA timezone metadata.
+- Timezone switching updates wall-time display only, never the underlying instant.
+This prevents DST-induced shifts and ambiguous transitions.
+
+---
+
+### Deliverables
+
+- Public Storybook (Chromatic published)
+- Fully documented component API
+- Constraint & DST test coverage
+- Accessibility audit documentation
+
+---
+
+### Development
+npm install
+npm run dev
+npm run storybook
