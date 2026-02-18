@@ -1,6 +1,7 @@
 import { useState } from "react"
 import type { DateRangeConstraints, PartialRange, TimeZone } from "./DateRangePicker.types"
 import { validateRange } from "./DateRangePicker.validation";
+import { generateMonthGrid } from "../../utils/calender";
 
 interface Props{
   constraints?:DateRangeConstraints;
@@ -12,6 +13,32 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
   const [range,setRange]=useState<PartialRange>({kind:"empty"});
   const [timeZone,setTimeZone]=useState<TimeZone>(defaultTimeZone);
   const validationError=validateRange(range,constraints);
+
+  const today=new Date();
+  const [visibleYear,setVisibleYear]=useState(today.getUTCFullYear());
+  const [visibleMonth,setVisibleMonth]=useState(today.getUTCMonth());
+
+  const calendarCells=generateMonthGrid(visibleYear,visibleMonth,timeZone);
+
+  const goToPrevMonth=()=>{
+    setVisibleMonth((prev)=>{
+      if(prev===0){
+        setVisibleYear((y)=>y-1);
+        return 11;
+      }
+      return prev-1;
+    });
+  };
+
+  const goToNextMonth=()=>{
+    setVisibleMonth((prev)=>{
+      if(prev===11){
+        setVisibleYear((y)=>y+1);
+        return 0;
+      }
+      return prev+1;
+    });
+  };
 
   const selectInstant=(instant:number)=>{
     setRange((prev)=>{
@@ -75,6 +102,8 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
               <option className="bg-neutral-900 text-white cursor-pointer" value="Asia/Kolkata">Asia/Kolkata</option>
             </select>
           </div>
+
+          <div className="space-y-4"></div>
 
           {/* Range Display */}
           <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-4 text-xs overflow-auto text-neutral-300">
