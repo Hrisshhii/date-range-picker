@@ -133,7 +133,9 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
 
           {/*Calendar Grid*/}
           <CalendarGrid year={visibleYear} month={visibleMonth} timeZone={timeZone} range={range} 
-          onSelect={selectInstant} focusedInstant={focusedInstant} setFocusedInstant={setFocusedInstant} labelledBy="calender-heading"/>
+          onSelect={selectInstant} focusedInstant={focusedInstant} setFocusedInstant={setFocusedInstant}
+          goToPrevMonth={goToPrevMonth} goToNextMonth={goToNextMonth}
+          labelledBy="calender-heading"/>
 
           {/*Range Display*/}
           <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-4 text-xs overflow-auto text-neutral-300">

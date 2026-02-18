@@ -11,6 +11,8 @@ interface CalendarGridProps {
   focusedInstant: number | null
   setFocusedInstant: (instant: number)=>void
   labelledBy:string
+  goToPrevMonth:()=>void
+  goToNextMonth:()=>void
 }
 
 const CalendarGrid = ({
@@ -21,7 +23,9 @@ const CalendarGrid = ({
   onSelect,
   focusedInstant,
   setFocusedInstant,
-  labelledBy
+  labelledBy,
+  goToPrevMonth,
+  goToNextMonth
 }: CalendarGridProps) => {
   const cellRefs=useRef<Record<number, HTMLButtonElement | null>>({})
 
@@ -60,6 +64,9 @@ const CalendarGrid = ({
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (focusedInstant === null) return
+    const currentIndex = calendarCells.findIndex((c) => c.instant === focusedInstant)
+
     switch (e.key) {
       case "ArrowRight":
         e.preventDefault()
@@ -77,10 +84,32 @@ const CalendarGrid = ({
         e.preventDefault()
         moveFocus(7)
         break
+      case "Home": {
+        e.preventDefault()
+        const startOfWeek = currentIndex - (currentIndex % 7)
+        const target = calendarCells[startOfWeek]
+        if (target) setFocusedInstant(target.instant)
+        break
+      }
+      case "End": {
+        e.preventDefault()
+        const endOfWeek = currentIndex + (6 - (currentIndex % 7))
+        const target = calendarCells[endOfWeek]
+        if (target) setFocusedInstant(target.instant)
+        break
+      }
+      case "PageUp":
+        e.preventDefault()
+        goToPrevMonth()
+        break
+      case "PageDown":
+        e.preventDefault()
+        goToNextMonth()
+        break
       case "Enter":
       case " ":
         e.preventDefault()
-        if (focusedInstant) onSelect(focusedInstant)
+        onSelect(focusedInstant)
         break
     }
   }
