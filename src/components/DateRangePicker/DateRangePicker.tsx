@@ -1,20 +1,18 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo,useState } from "react"
 import type { DateRangeConstraints, PartialRange, TimeZone } from "./DateRangePicker.types"
 import { validateRange } from "./DateRangePicker.validation";
 import { generateMonthGrid } from "../../utils/calender";
+import CalendarGrid from "../Calender/CalendarGrid";
 
 interface Props{
   constraints?:DateRangeConstraints;
   defaultTimeZone?:TimeZone;
 }
 
-
 const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
-  const cellRefs=useRef<Record<number,HTMLButtonElement|null>>({});
   const [range,setRange]=useState<PartialRange>({kind:"empty"});
   const [timeZone,setTimeZone]=useState<TimeZone>(defaultTimeZone);
   const validationError=validateRange(range,constraints);
-
   const [focusedInstant,setFocusedInstant]=useState<number|null>(null);
 
   const today=new Date();
@@ -80,64 +78,12 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
     })
   }
 
-  const isInRange=(instant: number)=>{
-    if(range.kind!=="complete") return false;
-    return instant>range.start && instant<range.end;
-  };
-
-  const isStart=(instant:number)=>range.kind!=="empty" && range.start===instant;
-  const isEnd=(instant:number)=>range.kind==="complete" && range.end===instant;
-
   useEffect(()=>{
     if(calendarCells.length>0){
       const first=calendarCells.find(c=>c.isCurrentMonth)?.instant??null;
       setFocusedInstant(first);
     }
   },[calendarCells]);
-
-  const moveFocus=(offsetDays:number)=>{
-    if(!focusedInstant) return;
-    const currentIndex=calendarCells.findIndex(c=>c.instant===focusedInstant);
-    if(currentIndex===-1) return;
-    const nextIndex=currentIndex+offsetDays;
-    if(nextIndex>=0 && nextIndex < calendarCells.length){
-      const nextCell=calendarCells[nextIndex];
-      if(!nextCell) return;
-      setFocusedInstant(nextCell.instant);
-    }
-  };
-
-  const handleKeyDown=(e:React.KeyboardEvent<HTMLElement>)=>{
-    switch (e.key){
-      case "ArrowRight":
-        e.preventDefault();
-        moveFocus(1);
-        break;
-      case "ArrowLeft":
-        e.preventDefault();
-        moveFocus(-1);
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        moveFocus(-7);
-        break;
-      case "ArrowDown":
-        e.preventDefault();
-        moveFocus(7);
-        break;
-      case "Enter":
-        e.preventDefault();
-        if(focusedInstant) selectInstant(focusedInstant);
-        break;
-    }
-  };
-
-  useEffect(()=>{
-    if(focusedInstant){
-      const el=cellRefs.current[focusedInstant];
-      el?.focus();
-    }
-  },[focusedInstant])
 
 
   return (
@@ -195,23 +141,8 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
           </div>
 
           {/*Calendar Grid*/}
-          <div role="grid" tabIndex={0} onKeyDown={handleKeyDown} className="grid grid-cols-7 gap-1 outline-none">
-            {calendarCells.map((cell)=>(
-              <button key={cell.instant} role="gridcell"
-                tabIndex={cell.instant===focusedInstant?0:-1}
-                aria-selected={range.kind==="complete" && cell.instant>=range.start && cell.instant<=range.end}
-                onClick={()=>selectInstant(cell.instant)}
-                onFocus={()=>setFocusedInstant(cell.instant)}
-                ref={el=>{cellRefs.current[cell.instant]=el}}
-                className={`aspect-square rounded-lg text-sm transition 
-                  ${cell.isCurrentMonth?"text-neutral-200 hover:bg-blue-500/20":"text-neutral-500"}
-                  ${isStart(cell.instant) || isEnd(cell.instant)?"bg-blue-500 text-white":""}
-                  ${isInRange(cell.instant)?"bg-blue-500/20":""} hover:bg-blue-500/30
-                  ${cell.instant===focusedInstant?"ring-2 ring-blue-400":""}
-                `}
-              >{cell.day}</button>
-            ))}
-          </div>
+          <CalendarGrid year={visibleYear} month={visibleMonth} timeZone={timeZone} range={range} 
+          onSelect={selectInstant} focusedInstant={focusedInstant} setFocusedInstant={setFocusedInstant}/>
 
           {/*Range Display*/}
           <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-4 text-xs overflow-auto text-neutral-300">
