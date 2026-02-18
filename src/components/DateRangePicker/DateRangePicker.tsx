@@ -88,9 +88,7 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-neutral-950 via-neutral-900 to-black flex items-center justify-center p-6 relative overflow-hidden">
-
       <div className="relative w-[95%] max-w-xl">
-
         <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl shadow-2xl p-8 space-y-8">
 
           {/*Header*/}
@@ -126,23 +124,16 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
             {/*Month Navigation*/}
             <div className="flex items-center justify-between">
               <button onClick={goToPrevMonth} className="px-3 py-2 rounded-lg transition bg-white/5 hover:bg-white/10">{`<`}</button>
-              <h3 className="text-lg font-medium text-neutral-200">
+              <h3 id="calender-heading" className="text-lg font-medium text-neutral-200">
                 {new Date(Date.UTC(visibleYear,visibleMonth)).toLocaleString("en-US",{month:"long",year:"numeric",})}
               </h3>
               <button onClick={goToNextMonth} className="px-3 py-2 rounded-lg transition bg-white/5 hover:bg-white/10">{`>`}</button>
             </div>
           </div>
 
-          {/*Week Headers*/}
-          <div className="grid grid-cols-7 text-xs text-neutral-400">
-            {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d)=>(
-              <div key={d} className="text-center py-1">{d}</div>
-            ))}
-          </div>
-
           {/*Calendar Grid*/}
           <CalendarGrid year={visibleYear} month={visibleMonth} timeZone={timeZone} range={range} 
-          onSelect={selectInstant} focusedInstant={focusedInstant} setFocusedInstant={setFocusedInstant}/>
+          onSelect={selectInstant} focusedInstant={focusedInstant} setFocusedInstant={setFocusedInstant} labelledBy="calender-heading"/>
 
           {/*Range Display*/}
           <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-4 text-xs overflow-auto text-neutral-300">

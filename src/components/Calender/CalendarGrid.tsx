@@ -10,6 +10,7 @@ interface CalendarGridProps {
   onSelect: (instant: number)=>void
   focusedInstant: number | null
   setFocusedInstant: (instant: number)=>void
+  labelledBy:string
 }
 
 const CalendarGrid = ({
@@ -19,7 +20,8 @@ const CalendarGrid = ({
   range,
   onSelect,
   focusedInstant,
-  setFocusedInstant
+  setFocusedInstant,
+  labelledBy
 }: CalendarGridProps) => {
   const cellRefs=useRef<Record<number, HTMLButtonElement | null>>({})
 
@@ -27,6 +29,11 @@ const CalendarGrid = ({
     () => generateMonthGrid(year, month, timeZone),
     [year, month, timeZone]
   )
+
+  const weeks=[]
+  for(let i=0;i<calendarCells.length;i+=7){
+    weeks.push(calendarCells.slice(i,i+7))
+  }
 
   // Focus DOM when focusedInstant changes
   useEffect(() => {
@@ -78,56 +85,69 @@ const CalendarGrid = ({
     }
   }
 
-  const isStart = (instant: number) =>
-    range.kind !== "empty" && range.start === instant
+  const isStart=(instant: number)=>range.kind!=="empty" && range.start===instant
 
-  const isEnd = (instant: number) =>
-    range.kind === "complete" && range.end === instant
+  const isEnd=(instant: number)=>range.kind==="complete" && range.end===instant
 
-  const isInRange = (instant: number) =>
-    range.kind === "complete" &&
-    instant > range.start &&
-    instant < range.end
+  const isInRange=(instant: number)=>
+    range.kind==="complete" &&
+    instant>range.start &&
+    instant<range.end
 
   return (
     <div
       role="grid"
+      aria-labelledby={labelledBy}
       tabIndex={0}
       onKeyDown={handleKeyDown}
-      className="grid grid-cols-7 gap-1 outline-none"
+      className="outline-none"
     >
-      {calendarCells.map((cell) => (
-        <button
-          key={cell.instant}
-          role="gridcell"
-          tabIndex={cell.instant === focusedInstant ? 0 : -1}
-          aria-selected={
-            range.kind === "complete" &&
-            cell.instant >= range.start &&
-            cell.instant <= range.end
-          }
-          ref={(el) => {
-            cellRefs.current[cell.instant] = el
-          }}
-          onClick={() => onSelect(cell.instant)}
-          onFocus={() => setFocusedInstant(cell.instant)}
-          className={`aspect-square rounded-lg text-sm transition 
-            ${
-              cell.isCurrentMonth
-                ? "text-neutral-200 hover:bg-blue-500/20"
-                : "text-neutral-500"
-            }
-            ${
-              isStart(cell.instant) || isEnd(cell.instant)
-                ? "bg-blue-500 text-white"
-                : ""
-            }
-            ${isInRange(cell.instant) ? "bg-blue-500/20" : ""}
-            ${cell.instant === focusedInstant ? "ring-2 ring-blue-400" : ""}
-          `}
+      {/* Column Headers */}
+      <div role="row" className="grid grid-cols-7 text-xs text-neutral-400 mb-2">
+        {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d)=>(
+          <div
+            key={d}
+            role="columnheader"
+            className="text-center py-1"
+          >
+            {d}
+          </div>
+        ))}
+      </div>
+
+      {/* Calendar Rows */}
+      {weeks.map((week, weekIndex)=>(
+        <div
+          key={weekIndex}
+          role="row"
+          className="grid grid-cols-7"
         >
-          {cell.day}
-        </button>
+          {week.map((cell)=>(
+            <button
+              key={cell.instant}
+              role="gridcell"
+              tabIndex={cell.instant===focusedInstant?0:-1}
+              aria-selected={
+                range.kind === "complete" &&
+                cell.instant >= range.start &&
+                cell.instant <= range.end
+              }
+              ref={(el)=>{
+                cellRefs.current[cell.instant]=el
+              }}
+              onClick={()=>onSelect(cell.instant)}
+              onFocus={()=>setFocusedInstant(cell.instant)}
+              className={`aspect-square rounded-lg text-sm transition m-1 
+                ${cell.isCurrentMonth?"text-neutral-200 hover:bg-blue-500/20":"text-neutral-500"}
+                ${(isStart(cell.instant) || isEnd(cell.instant))?"bg-blue-500 text-white":""}
+                ${isInRange(cell.instant)?"bg-blue-500/20":""}
+                ${cell.instant===focusedInstant?"ring-2 ring-blue-400":""}
+              `}
+            >
+              {cell.day}
+            </button>
+          ))}
+        </div>
       ))}
     </div>
   )
