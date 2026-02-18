@@ -51,12 +51,22 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
       }
 
       if(prev.kind==="selected-end"){
+        const start=prev.start;
+        const end=instant;
+
+        if(end<start){
+          return {
+            kind:"complete",
+            start:end,
+            end:start,
+            timeZone,
+          };
+        }
         return {
           kind:"complete",
-          start:prev.start,
-          end:instant,
+          start,end,
           timeZone,
-        };
+        }
       }
 
       return {
@@ -66,6 +76,14 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
       }
     })
   }
+
+  const isInRange=(instant: number)=>{
+    if(range.kind!=="complete") return false;
+    return instant>range.start && instant<range.end;
+  };
+
+  const isStart=(instant:number)=>range.kind!=="empty" && range.start===instant;
+  const isEnd=(instant:number)=>range.kind==="complete" && range.end===instant;
 
   return (
     <div className="min-h-screen bg-linear-to-br from-neutral-950 via-neutral-900 to-black flex items-center justify-center p-6 relative overflow-hidden">
@@ -105,7 +123,7 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
           {/*Calendar*/}
           <div className="space-y-4">
             {/*Month Navigation*/}
-            <div className="flex items center justify-between">
+            <div className="flex items-center justify-between">
               <button onClick={goToPrevMonth} className="px-3 py-2 rounded-lg transition bg-white/5 hover:bg-white/10">{`<`}</button>
               <h3 className="text-lg font-medium text-neutral-200">
                 {new Date(Date.UTC(visibleYear,visibleMonth)).toLocaleString("en-US",{month:"long",year:"numeric",})}
@@ -125,7 +143,10 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
           <div className="grid grid-cols-7 gap-1">
             {calendarCells.map((cell)=>(
               <button key={cell.instant} onClick={()=>selectInstant(cell.instant)}
-                className={`aspect-square rounded-lg text-sm transition ${cell.isCurrentMonth?"text-neutral-200 hover:bg-blue-500/20":"text-neutral-500"}`}
+                className={`aspect-square rounded-lg text-sm transition 
+                  ${cell.isCurrentMonth?"text-neutral-200 hover:bg-blue-500/20":"text-neutral-500"}
+                  ${isStart(cell.instant) || isEnd(cell.instant)?"bg-blue-500 text-white":""}
+                  ${isInRange(cell.instant)?"bg-blue-500/20":""} hover:bg-blue-500/30`}
               >{cell.day}</button>
             ))}
           </div>
