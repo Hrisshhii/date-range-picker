@@ -3,6 +3,7 @@ import type { DateRangeConstraints, PartialRange, TimeZone } from "./DateRangePi
 import { validateRange } from "./DateRangePicker.validation";
 import { generateMonthGrid } from "../../utils/calender";
 import CalendarGrid from "../Calender/CalendarGrid";
+import TimeInput from "../TimeInput/TimeInput";
 
 interface Props{
   constraints?:DateRangeConstraints;
@@ -133,6 +134,20 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
           onSelect={selectInstant} focusedInstant={focusedInstant} setFocusedInstant={setFocusedInstant}
           goToPrevMonth={goToPrevMonth} goToNextMonth={goToNextMonth}
           labelledBy="calender-heading"/>
+
+          {/*Time Input*/}
+          <div className="flex justify-between">
+            {range.kind!=="empty" && (
+              <TimeInput instant={range.start} timeZone={timeZone} label="Start Time" 
+              onChange={(newInstant)=>setRange((prev)=>prev.kind==="complete"?{...prev,start:newInstant}:{...prev,start:newInstant})}/>
+            )}
+
+            {range.kind==="complete" && (
+              <TimeInput instant={range.end} timeZone={timeZone} label="End Time" 
+              onChange={(newInstant)=>setRange((prev)=>prev.kind==="complete"?{...prev,end:newInstant}:prev)}/>
+            )}
+          </div>
+          
 
           {/*Range Display*/}
           <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-4 text-xs overflow-auto text-neutral-300">
