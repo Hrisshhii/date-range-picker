@@ -1,28 +1,31 @@
 export function createZonedMidnightInstant(
-  year:number,
-  month:number,
-  day:number,
-  timeZone:string,
-):number{
-  const isoDate=`${year}-${String(month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}T00:00:00`;
-  const formatter=new Intl.DateTimeFormat("en-US",{
+  year: number,
+  month: number,
+  day: number,
+  timeZone: string
+): number {
+  const utcMidnight=new Date(Date.UTC(year, month, day, 0, 0, 0))
+
+  const formatter=new Intl.DateTimeFormat("en-US", {
     timeZone,
-    hour12:false,
-    year:"numeric",
-    month:"2-digit",
-    day:"2-digit",
-    hour:"2-digit",
-    minute:"2-digit",
-    second:"2-digit",
-  });
-  const utcDate=new Date(isoDate+"Z");
-  const parts=formatter.formatToParts(utcDate);
-  const map:Record<string,string>={};
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  })
+
+  const parts=formatter.formatToParts(utcMidnight)
+  const map:Record<string,string>={}
+
   parts.forEach((p)=>{
-    if(p.type!=="literal"){
-      map[p.type]=p.value;
+    if (p.type!=="literal") {
+      map[p.type]=p.value
     }
-  });
+  })
+
   return Date.UTC(
     Number(map.year),
     Number(map.month)-1,
@@ -30,7 +33,7 @@ export function createZonedMidnightInstant(
     Number(map.hour),
     Number(map.minute),
     Number(map.second)
-  );
+  )
 }
 
 export interface CalenderCell{

@@ -16,28 +16,25 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
   const [focusedInstant,setFocusedInstant]=useState<number|null>(null);
 
   const today=new Date();
-  const [visibleYear,setVisibleYear]=useState(today.getUTCFullYear());
-  const [visibleMonth,setVisibleMonth]=useState(today.getUTCMonth());
+  const [visibleDate,setVisibleDate]=useState(new Date(Date.UTC(today.getUTCFullYear(),today.getUTCMonth(),1)))
+  const visibleYear=visibleDate.getUTCFullYear()
+  const visibleMonth=visibleDate.getUTCMonth()
 
   const calendarCells=useMemo(()=>generateMonthGrid(visibleYear,visibleMonth,timeZone),[visibleYear,visibleMonth,timeZone]);
 
   const goToPrevMonth=()=>{
-    setVisibleMonth((prev)=>{
-      if(prev===0){
-        setVisibleYear((y)=>y-1);
-        return 11;
-      }
-      return prev-1;
+    setVisibleDate((prev)=>{
+      const next=new Date(prev)
+      next.setUTCMonth(prev.getUTCMonth()-1)
+      return next
     });
   };
 
   const goToNextMonth=()=>{
-    setVisibleMonth((prev)=>{
-      if(prev===11){
-        setVisibleYear((y)=>y+1);
-        return 0;
-      }
-      return prev+1;
+    setVisibleDate((prev)=>{
+      const next=new Date(prev)
+      next.setUTCMonth(prev.getUTCMonth()+1)
+      return next
     });
   };
 
