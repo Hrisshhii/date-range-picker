@@ -67,7 +67,6 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
     })
   }
 
-
   return (
     <div className="min-h-screen bg-linear-to-br from-neutral-950 via-neutral-900 to-black flex items-center justify-center p-6 relative overflow-hidden">
 
@@ -75,7 +74,7 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
 
         <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl shadow-2xl p-8 space-y-8">
 
-          {/* Header */}
+          {/*Header*/}
           <header className="space-y-2">
             <h2 className="text-4xl font-semibold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-center">
               Date Range Picker
@@ -85,7 +84,7 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
             </p>
           </header>
 
-          {/* Timezone Select */}
+          {/*Timezone Select*/}
           <div className="space-y-2">
             <label htmlFor="timezone-select" className="text-sm font-medium text-neutral-300">
               Time Zone
@@ -103,9 +102,9 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
             </select>
           </div>
 
-          {/* Calendar */}
+          {/*Calendar*/}
           <div className="space-y-4">
-            {/* Month Navigation */}
+            {/*Month Navigation*/}
             <div className="flex items center justify-between">
               <button onClick={goToPrevMonth} className="px-3 py-2 rounded-lg transition bg-white/5 hover:bg-white/10">{`<`}</button>
               <h3 className="text-lg font-medium text-neutral-200">
@@ -131,12 +130,12 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
             ))}
           </div>
 
-          {/* Range Display */}
+          {/*Range Display*/}
           <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-4 text-xs overflow-auto text-neutral-300">
             <pre>{JSON.stringify(range, null, 2)}</pre>
           </div>
 
-          {/* Validation */}
+          {/*Validation*/}
           {validationError && (
             <div className="bg-red-500/10 backdrop-blur-md border border-red-500/30 text-red-300 rounded-xl p-3 text-sm">
               Validation Error: {validationError}
