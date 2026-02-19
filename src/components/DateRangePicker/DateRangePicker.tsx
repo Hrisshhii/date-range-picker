@@ -93,6 +93,11 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
     })
   }
 
+  const selectionAnnouncement=useMemo(()=>{
+    if(range.kind!=="complete") return ""
+    return `Selected from ${new Date(range.start).toUTCString()} to ${new Date(range.end).toUTCString()}`
+  },[range])
+
   return (
     <div className="min-h-screen bg-linear-to-br from-neutral-950 via-neutral-900 to-black flex items-center justify-center p-6 relative overflow-hidden">
       <div className="relative w-[95%] max-w-xl">
@@ -107,6 +112,13 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
               Timezone-aware · DST-safe · Accessible
             </p>
           </header>
+
+          <div aria-live="polite" aria-atomic="true" className="sr-only">
+            {new Date(Date.UTC(visibleYear, visibleMonth)).toLocaleString("en-US", { month: "long", year: "numeric" })}
+          </div>
+          <div aria-live="polite" className="sr-only">
+            {selectionAnnouncement}
+          </div>
 
           {/*Timezone Select*/}
           <div className="space-y-2">
@@ -144,7 +156,8 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
           <CalendarGrid year={visibleYear} month={visibleMonth} timeZone={timeZone} range={range} 
           onSelect={selectInstant} focusedInstant={focusedInstant} setFocusedInstant={setFocusedInstant}
           goToPrevMonth={goToPrevMonth} goToNextMonth={goToNextMonth}
-          labelledBy="calender-heading"/>
+          constraints={constraints} labelledBy="calender-heading"
+          />
 
           {/*Time Input*/}
           <div className="flex justify-between">

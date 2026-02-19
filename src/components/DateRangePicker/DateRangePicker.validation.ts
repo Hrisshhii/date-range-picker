@@ -27,5 +27,16 @@ export function validateRange(
     return "DURATION_VIOLATION";
   }
 
+  if(constraints?.blackoutDates?.length){
+    const blackoutSet=new Set(constraints.blackoutDates)
+
+    const step=24*60*60*1000
+    for (let t=start;t<=end;t+=step){
+      if(blackoutSet.has(t)){
+        return "BLACKOUT_VIOLATION"
+      }
+    }
+  }
+
   return null;
 }

@@ -1,6 +1,15 @@
 import { createZonedMidnightInstant } from "../../utils/calender"
 import type { PresetDefinition } from "./Presets.types"
 
+/**
+ * Deterministic Rounding Rules:
+ *
+ * - Date-based presets use zoned midnight for start.
+ * - End of day is computed as start + 24h - 1ms.
+ * - Rolling presets use exact `now` instant without rounding.
+ * - No implicit timezone coercion.
+ */
+
 const MS_IN_DAY=24*60*60*1000
 export const presets:PresetDefinition[]=[
   {

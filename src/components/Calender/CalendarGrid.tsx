@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react"
-import type { PartialRange } from "../DateRangePicker/DateRangePicker.types"
+import type { DateRangeConstraints, PartialRange } from "../DateRangePicker/DateRangePicker.types"
 import { generateMonthGrid } from "../../utils/calender"
 
 interface CalendarGridProps {
@@ -13,6 +13,7 @@ interface CalendarGridProps {
   labelledBy:string
   goToPrevMonth:()=>void
   goToNextMonth:()=>void
+  constraints?:DateRangeConstraints
 }
 
 const CalendarGrid = ({
@@ -25,7 +26,8 @@ const CalendarGrid = ({
   setFocusedInstant,
   labelledBy,
   goToPrevMonth,
-  goToNextMonth
+  goToNextMonth,
+  constraints
 }: CalendarGridProps) => {
   const cellRefs=useRef<Record<number, HTMLButtonElement | null>>({})
 
@@ -109,7 +111,9 @@ const CalendarGrid = ({
       case "Enter":
       case " ":
         e.preventDefault()
-        onSelect(focusedInstant)
+        if(!isBlackout(focusedInstant)){
+          onSelect(focusedInstant)
+        }
         break
     }
   }
@@ -118,10 +122,9 @@ const CalendarGrid = ({
 
   const isEnd=(instant: number)=>range.kind==="complete" && range.end===instant
 
-  const isInRange=(instant: number)=>
-    range.kind==="complete" &&
-    instant>range.start &&
-    instant<range.end
+  const isInRange=(instant: number)=>range.kind==="complete" && instant>range.start && instant<range.end
+
+  const isBlackout=(instant:number)=>constraints?.blackoutDates?.includes(instant)??false
 
   return (
     <div
@@ -164,13 +167,19 @@ const CalendarGrid = ({
               ref={(el)=>{
                 cellRefs.current[cell.instant]=el
               }}
-              onClick={()=>onSelect(cell.instant)}
+              onClick={()=>{
+                if(isBlackout(cell.instant)) return
+                onSelect(cell.instant)
+              }}
               onFocus={()=>setFocusedInstant(cell.instant)}
+              disabled={isBlackout(cell.instant)}
+              aria-disabled={isBlackout(cell.instant)}
               className={`aspect-square rounded-lg text-sm transition m-1 
                 ${cell.isCurrentMonth?"text-neutral-200 hover:bg-blue-500/20":"text-neutral-500"}
                 ${(isStart(cell.instant) || isEnd(cell.instant))?"bg-blue-500 text-white":""}
                 ${isInRange(cell.instant)?"bg-blue-500/20":""}
                 ${cell.instant===focusedInstant?"ring-2 ring-blue-400":""}
+                ${isBlackout(cell.instant)?"opacity-30 cursor-not-allowed":""}
               `}
             >
               {cell.day}
