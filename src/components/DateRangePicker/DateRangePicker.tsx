@@ -4,6 +4,7 @@ import { validateRange } from "./DateRangePicker.validation";
 import { generateMonthGrid } from "../../utils/calender";
 import CalendarGrid from "../Calender/CalendarGrid";
 import TimeInput from "../TimeInput/TimeInput";
+import Presets from "../Presets/Presets.tsx"
 
 interface Props{
   constraints?:DateRangeConstraints;
@@ -83,6 +84,14 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
     }
   },[calendarCells]);
 
+  const applyPreset=(start:number,end:number)=>{
+    setRange({
+      kind:"complete",
+      start,
+      end,
+      timeZone
+    })
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-neutral-950 via-neutral-900 to-black flex items-center justify-center p-6 relative overflow-hidden">
@@ -116,6 +125,8 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
               <option className="bg-neutral-900 text-white cursor-pointer" value="Asia/Kolkata">Asia/Kolkata</option>
             </select>
           </div>
+
+          <Presets timeZone={timeZone} onApply={applyPreset}/>
 
           {/*Calendar*/}
           <div className="space-y-4">
