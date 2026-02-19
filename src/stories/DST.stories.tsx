@@ -13,7 +13,7 @@ type Story = StoryObj<typeof DateRangePicker>
 // DST boundary instants
 const springStart = createZonedMidnightInstant(
   2026,
-  2, // March (0-based)
+  2,
   8,
   "America/New_York"
 )

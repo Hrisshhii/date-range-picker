@@ -46,5 +46,22 @@ export function buildZonedInstant(
     (hour - zoned.hour) * 60 +
     (minute - zoned.minute)
 
-  return utcGuess + diffMinutes * 60_000
+  const corrected = utcGuess + diffMinutes * 60_000
+
+  const verify = convertInstantToTimeZone(corrected, timeZone)
+
+  // If local time doesn't match intended time,
+  // it means DST gap → snap forward automatically
+  if (
+    verify.year !== year ||
+    verify.month !== month + 1 ||
+    verify.day !== day ||
+    verify.hour !== hour ||
+    verify.minute !== minute
+  ) {
+    return corrected
+  }
+
+  return corrected
 }
+

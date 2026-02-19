@@ -29,16 +29,22 @@ export const WithBlackout: Story = {
   },
 }
 
-const jan5=createZonedMidnightInstant(2026,0,5,"UTC")
-const jan25=createZonedMidnightInstant(2026,0,25,"UTC")
-
 export const WithMinMax: Story = {
   args: {
+    defaultTimeZone: "UTC",
     constraints: {
-      min: jan5,
-      max: jan25,
+      min: createZonedMidnightInstant(2026, 0, 5, "UTC"),
+      max: createZonedMidnightInstant(2026, 0, 25, "UTC"),
     },
   },
+  render: (args) => {
+    return (
+      <DateRangePicker
+        {...args}
+        key="minmax"
+      />
+    )
+  }
 }
 
 export const WithDurationLimit: Story = {

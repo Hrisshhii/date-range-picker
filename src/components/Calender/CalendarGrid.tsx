@@ -124,6 +124,13 @@ const CalendarGrid = ({
 
   const isInRange=(instant: number)=>range.kind==="complete" && instant>range.start && instant<range.end
 
+  const isOutOfRange=(instant:number)=>{
+    if(!constraints) return false
+    if(constraints.min && instant<constraints.min) return true
+    if(constraints.max && instant>constraints.max) return true
+    return false
+  }
+
   const isBlackout=(instant:number)=>constraints?.blackoutDates?.includes(instant)??false
 
   return (
@@ -172,14 +179,15 @@ const CalendarGrid = ({
                 onSelect(cell.instant)
               }}
               onFocus={()=>setFocusedInstant(cell.instant)}
-              disabled={isBlackout(cell.instant)}
-              aria-disabled={isBlackout(cell.instant)}
+              disabled={isBlackout(cell.instant) || isOutOfRange(cell.instant)}
+              aria-disabled={isBlackout(cell.instant) || isOutOfRange(cell.instant)}
               className={`aspect-square rounded-lg text-sm transition m-1 
                 ${cell.isCurrentMonth?"text-neutral-200 hover:bg-blue-500/20":"text-neutral-500"}
                 ${(isStart(cell.instant) || isEnd(cell.instant))?"bg-blue-500 text-white":""}
                 ${isInRange(cell.instant)?"bg-blue-500/20":""}
                 ${cell.instant===focusedInstant?"ring-2 ring-blue-400":""}
                 ${isBlackout(cell.instant)?"opacity-30 cursor-not-allowed":""}
+                ${isOutOfRange(cell.instant)?"opacity-30 cursor-not-allowed":""}
               `}
             >
               {cell.day}
