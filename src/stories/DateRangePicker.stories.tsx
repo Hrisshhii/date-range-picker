@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import DateRangePicker from "../components/DateRangePicker/DateRangePicker"
+import { createZonedMidnightInstant } from "../utils/calender"
 
 const meta: Meta<typeof DateRangePicker> = {
   title: "Components/DateRangePicker",
@@ -28,11 +29,14 @@ export const WithBlackout: Story = {
   },
 }
 
+const jan5=createZonedMidnightInstant(2026,0,5,"UTC")
+const jan25=createZonedMidnightInstant(2026,0,25,"UTC")
+
 export const WithMinMax: Story = {
   args: {
     constraints: {
-      min: Date.UTC(2026, 0, 5),
-      max: Date.UTC(2026, 0, 25),
+      min: jan5,
+      max: jan25,
     },
   },
 }
