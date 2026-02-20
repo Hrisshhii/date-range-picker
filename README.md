@@ -99,3 +99,9 @@ This prevents DST-induced shifts and ambiguous transitions.
 npm install
 npm run dev
 npm run storybook
+
+---
+
+### Storybook Chromatic
+
+Link: https://6998a90229102f443d6b1cb3-ylzyekmhqk.chromatic.com/
