@@ -17,6 +17,7 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
   const [timeZone,setTimeZone]=useState<TimeZone>(defaultTimeZone);
   const validationError=validateRange(range,constraints);
   const [focusedInstant,setFocusedInstant]=useState<number|null>(null);
+  const [anchorInstant, setAnchorInstant] = useState<number | null>(null)
 
   const today=new Date();
   const [visibleDate,setVisibleDate]=useState(new Date(Date.UTC(today.getUTCFullYear(),today.getUTCMonth(),1)))
@@ -41,38 +42,39 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
     });
   };
 
-  const selectInstant=(instant:number)=>{
-    setRange((prev)=>{
-      if(prev.kind==="empty"){
+  const selectInstant = (instant: number) => {
+    setRange((prev) => {
+      if (prev.kind === "empty") {
+        setAnchorInstant(instant)
         return {
-          kind:"selected-end",
-          start:instant,
-          timeZone,
-        };
-      }
-
-      if(prev.kind==="selected-end"){
-        const start=prev.start;
-        const end=instant;
-
-        if(end<start){
-          return {
-            kind:"complete",
-            start:end,
-            end:start,
-            timeZone,
-          };
-        }
-        return {
-          kind:"complete",
-          start,end,
+          kind: "selected-end",
+          start: instant,
           timeZone,
         }
       }
 
+      if (prev.kind === "selected-end") {
+        const start = prev.start
+        const end = instant
+
+        const finalStart = end < start ? end : start
+        const finalEnd = end < start ? start : end
+
+        setAnchorInstant(finalStart)
+
+        return {
+          kind: "complete",
+          start: finalStart,
+          end: finalEnd,
+          timeZone,
+        }
+      }
+
+      // if already complete → start new selection
+      setAnchorInstant(instant)
       return {
-        kind:"selected-end",
-        start:instant,
+        kind: "selected-end",
+        start: instant,
         timeZone,
       }
     })
@@ -102,6 +104,23 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
   const resetSelection=()=>{
     setRange({kind:"empty"})
   };
+
+  const extendRange = (toInstant: number) => {
+    if (anchorInstant === null) return
+
+    const start = anchorInstant
+    const end = toInstant
+
+    const finalStart = end < start ? end : start
+    const finalEnd = end < start ? start : end
+
+    setRange({
+      kind: "complete",
+      start: finalStart,
+      end: finalEnd,
+      timeZone,
+    })
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-neutral-950 via-neutral-900 to-black flex items-center justify-center p-6 relative overflow-hidden">
@@ -161,7 +180,7 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
           <CalendarGrid year={visibleYear} month={visibleMonth} timeZone={timeZone} range={range} 
           onSelect={selectInstant} focusedInstant={focusedInstant} setFocusedInstant={setFocusedInstant}
           goToPrevMonth={goToPrevMonth} goToNextMonth={goToNextMonth}
-          onSelectReset={resetSelection}
+          onSelectReset={resetSelection} onExtendRange={extendRange} anchorInstant={anchorInstant}
           constraints={constraints} labelledBy="calender-heading"
           />
 

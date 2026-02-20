@@ -17,6 +17,8 @@ interface CalendarGridProps {
   goToNextMonth:()=>void
   constraints?:DateRangeConstraints
   onSelectReset:()=>void
+  onExtendRange: (toInstant: number) => void
+  anchorInstant: number | null
 }
 
 const CalendarGrid = ({
@@ -31,7 +33,9 @@ const CalendarGrid = ({
   goToPrevMonth,
   goToNextMonth,
   constraints,
-  onSelectReset
+  onSelectReset,
+  onExtendRange,
+  anchorInstant
 }: CalendarGridProps) => {
   const cellRefs=useRef<Record<number, HTMLButtonElement | null>>({})
 
@@ -53,43 +57,52 @@ const CalendarGrid = ({
     }
   }, [focusedInstant])
 
-  const moveFocus = (offset: number) => {
-    if (!focusedInstant) return
-
-    const currentIndex = calendarCells.findIndex(
-      (c) => c.instant === focusedInstant
-    )
-    if (currentIndex === -1) return
-
-    const nextIndex = currentIndex + offset
-    if (nextIndex >= 0 && nextIndex < calendarCells.length) {
-      const nextCell=calendarCells[nextIndex]
-      if(!nextCell) return
-      setFocusedInstant(nextCell.instant)
-    }
-  }
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (focusedInstant === null) return
     const currentIndex = calendarCells.findIndex((c) => c.instant === focusedInstant)
 
     switch (e.key) {
       case "ArrowRight":
-        e.preventDefault()
-        moveFocus(1)
-        break
       case "ArrowLeft":
-        e.preventDefault()
-        moveFocus(-1)
-        break
       case "ArrowUp":
+      case "ArrowDown": {
         e.preventDefault()
-        moveFocus(-7)
+
+        const offsetMap: Record<string, number> = {
+          ArrowRight: 1,
+          ArrowLeft: -1,
+          ArrowUp: -7,
+          ArrowDown: 7,
+        }
+
+        const offset = offsetMap[e.key]
+        if (offset === undefined) break
+
+        if (focusedInstant === null) break
+
+        const currentIndex = calendarCells.findIndex(
+          (c) => c.instant === focusedInstant
+        )
+
+        if (currentIndex === -1) break
+
+        const nextIndex = currentIndex + offset
+        const nextCell = calendarCells[nextIndex]
+
+        if (!nextCell) break
+
+        setFocusedInstant(nextCell.instant)
+
+        if (
+          e.shiftKey &&
+          anchorInstant !== null &&
+          (range.kind === "selected-end" || range.kind === "complete")
+        ) {
+          onExtendRange(nextCell.instant)
+        }
+
         break
-      case "ArrowDown":
-        e.preventDefault()
-        moveFocus(7)
-        break
+      }
       case "Home": {
         e.preventDefault()
         const startOfWeek = currentIndex - (currentIndex % 7)
@@ -159,6 +172,7 @@ const CalendarGrid = ({
       aria-colcount={7}
       onKeyDown={handleKeyDown}
       className="outline-none"
+      aria-multiselectable="true"
     >
       {/* Column Headers */}
       <div role="row" className="grid grid-cols-7 text-xs text-neutral-400 mb-2">
