@@ -38,29 +38,27 @@ export function buildZonedInstant(
   timeZone: string
 ): number {
 
-  // Create a Date object pretending local time is UTC
-  const utcDate = new Date(Date.UTC(year, month, day, hour, minute, 0));
+  let guess = Date.UTC(year, month, day, hour, minute, 0);
 
-  // Get actual timezone offset in minutes at that instant
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    timeZoneName: "shortOffset",
-  });
+  for (let i = 0; i < 3; i++) {
+    const zoned = convertInstantToTimeZone(guess, timeZone);
 
-  const parts = formatter.formatToParts(utcDate);
+    const desired = Date.UTC(year, month, day, hour, minute, 0);
+    const actual = Date.UTC(
+      zoned.year,
+      zoned.month - 1,
+      zoned.day,
+      zoned.hour,
+      zoned.minute,
+      0
+    );
 
-  const tzPart = parts.find(p => p.type === "timeZoneName")?.value;
+    const diff = desired - actual;
 
-  if (!tzPart) return utcDate.getTime();
+    if (diff === 0) break;
 
-  // Extract offset like "GMT-4"
-  const match = tzPart.match(/GMT([+-]\d+)/);
+    guess += diff;
+  }
 
-  if (!match) return utcDate.getTime();
-
-  const offsetHours = Number(match[1]);
-
-  const offsetMs = offsetHours * 60 * 60 * 1000;
-
-  return utcDate.getTime() - offsetMs;
+  return guess;
 }
