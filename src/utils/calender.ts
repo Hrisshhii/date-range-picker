@@ -1,40 +1,21 @@
+import { buildZonedInstant, convertInstantToTimeZone } from "./timezone"
+
 export function createZonedMidnightInstant(
   year: number,
   month: number,
   day: number,
   timeZone: string
 ): number {
-  const utcMidnight=new Date(Date.UTC(year, month, day, 0, 0, 0))
-
-  const formatter=new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    hour12: false,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  })
-
-  const parts=formatter.formatToParts(utcMidnight)
-  const map:Record<string,string>={}
-
-  parts.forEach((p)=>{
-    if (p.type!=="literal") {
-      map[p.type]=p.value
-    }
-  })
-
-  return Date.UTC(
-    Number(map.year),
-    Number(map.month)-1,
-    Number(map.day),
-    Number(map.hour),
-    Number(map.minute),
-    Number(map.second)
+  return buildZonedInstant(
+    year,
+    month,
+    day,
+    0,
+    0,
+    timeZone
   )
 }
+
 
 export interface CalenderCell{
   instant:number;
@@ -50,8 +31,17 @@ export function generateMonthGrid(
   const cells:CalenderCell[]=[];
 
   const firstOfMonth=createZonedMidnightInstant(year,month,1,timeZone);
-  const firstDate=new Date(firstOfMonth);
-  const firstDayOfWeek=firstDate.getUTCDay();
+  const firstZoned = convertInstantToTimeZone(firstOfMonth, timeZone);
+
+  // Build a UTC date from zoned components
+  const zonedDate = new Date(Date.UTC(
+    firstZoned.year,
+    firstZoned.month - 1,
+    firstZoned.day
+  ));
+
+const firstDayOfWeek = zonedDate.getUTCDay();
+
   
   const daysInMonth=new Date(Date.UTC(year,month+1,0)).getUTCDate();
   const prevMonthDays=new Date(Date.UTC(year,month,0)).getUTCDate();

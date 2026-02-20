@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useState } from "react"
 import { buildZonedInstant, convertInstantToTimeZone } from "../../utils/timezone"
 
@@ -15,13 +16,19 @@ const TimeInput = ({ instant, timeZone, label, onChange }: TimeInputProps) => {
     [instant, timeZone]
   )
 
+
   const [hourInput, setHourInput] = useState(String(zoned.hour))
   const [minuteInput, setMinuteInput] = useState(String(zoned.minute))
 
   useEffect(() => {
-    setHourInput(String(zoned.hour))
-    setMinuteInput(String(zoned.minute))
-  }, [zoned.hour, zoned.minute])
+    const newHour = String(zoned.hour)
+    const newMinute = String(zoned.minute)
+
+    setHourInput(prev => (prev !== newHour ? newHour : prev))
+    setMinuteInput(prev => (prev !== newMinute ? newMinute : prev))
+  }, [instant, timeZone, zoned.hour, zoned.minute])
+
+
 
   const commitHour = () => {
     const hour = Number(hourInput)
@@ -36,7 +43,9 @@ const TimeInput = ({ instant, timeZone, label, onChange }: TimeInputProps) => {
       timeZone
     )
 
-    onChange(newInstant)
+    if (newInstant !== instant) {
+      onChange(newInstant)
+    }
   }
 
   const commitMinute = () => {
@@ -52,8 +61,11 @@ const TimeInput = ({ instant, timeZone, label, onChange }: TimeInputProps) => {
       timeZone
     )
 
-    onChange(newInstant)
+    if (newInstant !== instant) {
+      onChange(newInstant)
+    }
   }
+
 
   return (
     <div className="flex flex-col gap-2">
