@@ -5,7 +5,7 @@ import { generateMonthGrid } from "../../utils/calender";
 import CalendarGrid from "../Calender/CalendarGrid";
 import TimeInput from "../TimeInput/TimeInput";
 import Presets from "../Presets/Presets.tsx"
-import { convertInstantToTimeZone } from "../../utils/timezone.ts";
+//import { convertInstantToTimeZone } from "../../utils/timezone.ts";
 
 interface Props{
   constraints?:DateRangeConstraints;
@@ -201,9 +201,9 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
           
 
           {/*Range Display*/}
-          <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-4 text-xs overflow-auto text-neutral-300">
+          {/* <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-4 text-xs overflow-auto text-neutral-300">
             <pre>{JSON.stringify(range, null, 2)}</pre>
-          </div>
+          </div> */}
 
           {/*Validation*/}
           {validationError && (
@@ -218,12 +218,12 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
           )}
 
 
-          {range.kind !== "empty" && (
+          {/* {range.kind !== "empty" && (
             <div className="text-xs text-yellow-400 mt-2">
               Start Local:{" "}
               {JSON.stringify(convertInstantToTimeZone(range.start, timeZone))}
             </div>
-          )}
+          )} */}
 
         </div>
       </div>

@@ -55,3 +55,24 @@ export const WithDurationLimit: Story = {
     },
   },
 }
+
+export const WithMinViolation = {
+  args: {
+    defaultTimeZone: "UTC",
+    constraints: {
+      min: createZonedMidnightInstant(2026, 0, 10, "UTC"),
+    },
+  },
+}
+
+export const KeyboardOnly = {
+  args: {},
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use arrow keys to navigate. Press Enter to select start and end. Escape resets selection.",
+      },
+    },
+  },
+}
