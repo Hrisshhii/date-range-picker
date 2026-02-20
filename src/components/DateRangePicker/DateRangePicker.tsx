@@ -99,6 +99,10 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
     return `Selected from ${new Date(range.start).toUTCString()} to ${new Date(range.end).toUTCString()}`
   },[range])
 
+  const resetSelection=()=>{
+    setRange({kind:"empty"})
+  };
+
   return (
     <div className="min-h-screen bg-linear-to-br from-neutral-950 via-neutral-900 to-black flex items-center justify-center p-6 relative overflow-hidden">
       <div className="relative w-[95%] max-w-xl">
@@ -157,6 +161,7 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
           <CalendarGrid year={visibleYear} month={visibleMonth} timeZone={timeZone} range={range} 
           onSelect={selectInstant} focusedInstant={focusedInstant} setFocusedInstant={setFocusedInstant}
           goToPrevMonth={goToPrevMonth} goToNextMonth={goToNextMonth}
+          onSelectReset={resetSelection}
           constraints={constraints} labelledBy="calender-heading"
           />
 
@@ -164,12 +169,14 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
           <div className="flex justify-between">
             {range.kind!=="empty" && (
               <TimeInput instant={range.start} timeZone={timeZone} label="Start Time" 
-              onChange={(newInstant)=>setRange((prev)=>prev.kind==="complete"?{...prev,start:newInstant}:{...prev,start:newInstant})}/>
+              onChange={(newInstant)=>setRange((prev)=>prev.kind==="complete"?{...prev,start:newInstant}:{...prev,start:newInstant})}
+              aria-describedby={validationError ? "range-error" : undefined} aria-invalid={!!validationError}/>
             )}
 
             {range.kind==="complete" && (
               <TimeInput instant={range.end} timeZone={timeZone} label="End Time" 
-              onChange={(newInstant)=>setRange((prev)=>prev.kind==="complete"?{...prev,end:newInstant}:prev)}/>
+              onChange={(newInstant)=>setRange((prev)=>prev.kind==="complete"?{...prev,end:newInstant}:prev)}
+              aria-describedby={validationError ? "range-error" : undefined} aria-invalid={!!validationError}/>
             )}
           </div>
           
@@ -181,7 +188,12 @@ const DateRangePicker = ({constraints,defaultTimeZone="UTC"}:Props) => {
 
           {/*Validation*/}
           {validationError && (
-            <div className="bg-red-500/10 backdrop-blur-md border border-red-500/30 text-red-300 rounded-xl p-3 text-sm">
+            <div
+              id="range-error"
+              role="alert"
+              aria-live="assertive"
+              className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-xl p-3 text-sm"
+            >
               Validation Error: {validationError}
             </div>
           )}

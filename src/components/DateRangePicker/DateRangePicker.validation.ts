@@ -1,3 +1,4 @@
+import { buildZonedInstant, convertInstantToTimeZone } from "../../utils/timezone";
 import type {PartialRange,ValidationError,DateRangeConstraints} from "./DateRangePicker.types";
 
 export function validateRange(
@@ -30,11 +31,20 @@ export function validateRange(
   if(constraints?.blackoutDates?.length){
     const blackoutSet=new Set(constraints.blackoutDates)
 
-    const step=24*60*60*1000
-    for (let t=start;t<=end;t+=step){
-      if(blackoutSet.has(t)){
-        return "BLACKOUT_VIOLATION"
-      }
+    let cursor = start
+    while (cursor <= end) {
+      if (blackoutSet.has(cursor)) return "BLACKOUT_VIOLATION"
+
+      const zoned = convertInstantToTimeZone(cursor, range.timeZone)
+
+      cursor = buildZonedInstant(
+        zoned.year,
+        zoned.month - 1,
+        zoned.day + 1,
+        0,
+        0,
+        range.timeZone
+      )
     }
   }
 

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef } from "react"
 import type { DateRangeConstraints, PartialRange } from "../DateRangePicker/DateRangePicker.types"
 import { generateMonthGrid } from "../../utils/calender"
+import { createZonedMidnightInstant } from "../../utils/calender"
+import { convertInstantToTimeZone } from "../../utils/timezone"
 
 interface CalendarGridProps {
   year: number
@@ -14,6 +16,7 @@ interface CalendarGridProps {
   goToPrevMonth:()=>void
   goToNextMonth:()=>void
   constraints?:DateRangeConstraints
+  onSelectReset:()=>void
 }
 
 const CalendarGrid = ({
@@ -27,7 +30,8 @@ const CalendarGrid = ({
   labelledBy,
   goToPrevMonth,
   goToNextMonth,
-  constraints
+  constraints,
+  onSelectReset
 }: CalendarGridProps) => {
   const cellRefs=useRef<Record<number, HTMLButtonElement | null>>({})
 
@@ -108,6 +112,10 @@ const CalendarGrid = ({
         e.preventDefault()
         goToNextMonth()
         break
+      case "Escape":
+        e.preventDefault();
+        onSelectReset();
+        break;
       case "Enter":
       case " ":
         e.preventDefault()
@@ -133,11 +141,22 @@ const CalendarGrid = ({
 
   const isBlackout=(instant:number)=>constraints?.blackoutDates?.includes(instant)??false
 
+  // eslint-disable-next-line react-hooks/purity
+  const todayZoned = convertInstantToTimeZone(Date.now(), timeZone)
+
+  const todayInstant = createZonedMidnightInstant(
+    todayZoned.year,
+    todayZoned.month - 1,
+    todayZoned.day,
+    timeZone
+  )
+
   return (
     <div
       role="grid"
       aria-labelledby={labelledBy}
-      tabIndex={0}
+      aria-rowcount={6}
+      aria-colcount={7}
       onKeyDown={handleKeyDown}
       className="outline-none"
     >
@@ -181,6 +200,7 @@ const CalendarGrid = ({
               onFocus={()=>setFocusedInstant(cell.instant)}
               disabled={isBlackout(cell.instant) || isOutOfRange(cell.instant)}
               aria-disabled={isBlackout(cell.instant) || isOutOfRange(cell.instant)}
+              aria-current={cell.instant===todayInstant?"date":undefined}
               className={`aspect-square rounded-lg text-sm transition m-1 
                 ${cell.isCurrentMonth?"text-neutral-200 hover:bg-blue-500/20":"text-neutral-500"}
                 ${(isStart(cell.instant) || isEnd(cell.instant))?"bg-blue-500 text-white":""}
@@ -188,6 +208,7 @@ const CalendarGrid = ({
                 ${cell.instant===focusedInstant?"ring-2 ring-blue-400":""}
                 ${isBlackout(cell.instant)?"opacity-30 cursor-not-allowed":""}
                 ${isOutOfRange(cell.instant)?"opacity-30 cursor-not-allowed":""}
+                ${cell.instant===todayInstant?"ring-1 ring-yellow-400":""}
               `}
             >
               {cell.day}

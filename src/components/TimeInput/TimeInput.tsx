@@ -7,9 +7,11 @@ interface TimeInputProps {
   timeZone: string
   label: string
   onChange: (newInstant: number) => void
+  "aria-describedby"?: string
+  "aria-invalid"?: boolean
 }
 
-const TimeInput = ({ instant, timeZone, label, onChange }: TimeInputProps) => {
+const TimeInput = ({ instant, timeZone, label, onChange,"aria-describedby": ariaDescribedBy,"aria-invalid": ariaInvalid }: TimeInputProps) => {
 
   const zoned = useMemo(
     () => convertInstantToTimeZone(instant, timeZone),
@@ -78,6 +80,8 @@ const TimeInput = ({ instant, timeZone, label, onChange }: TimeInputProps) => {
           onChange={(e) => setHourInput(e.target.value)}
           onBlur={commitHour}
           onKeyDown={(e) => e.key === "Enter" && commitHour()}
+          aria-describedby={ariaDescribedBy}
+          aria-invalid={ariaInvalid}
           className="w-16 px-2 py-1 rounded text-white bg-white/10 border border-white/20 text-center focus:outline-none focus:ring-2 focus:ring-blue-500/40"
         />
 
