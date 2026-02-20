@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import DateRangePicker from "../components/DateRangePicker/DateRangePicker"
 import { createZonedMidnightInstant } from "../utils/calender"
 
